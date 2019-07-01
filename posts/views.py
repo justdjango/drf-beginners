@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework import mixins
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from .models import Post
 from .serializers import PostSerializer
 
@@ -17,6 +21,26 @@ class PostView(APIView):
         serializer = PostSerializer(queryset, many=True)
         # if serializer.is_valid():
         return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "some message"}, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk, *args, **kwargs):
+        post = Post.objects.get(pk=pk)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, *args, **kwargs):
+        post = Post.objects.get(pk=pk)
+        post.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 @csrf_exempt
@@ -56,3 +80,36 @@ def post_detail(request, pk):
     elif request.method == 'DELETE':
         post.delete()
         return HttpResponse(status=204)
+
+
+@api_view(['GET', 'POST'])
+def post_list(request):
+    if request.method == "GET":
+        pass
+    
+
+class PostMixinListView(
+    mixins.ListModelMixin, 
+    mixins.CreateModelMixin,
+    generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class PostListView(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class PostDetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class PostDestroyView(generics.DestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
