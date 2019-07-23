@@ -15,6 +15,13 @@ class Post(models.Model):
     category = models.CharField(max_length=3, choices=CATEGORY_CHOICES)
     publish_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+    comments = models.ManyToManyField('Comment')
 
     def __str__(self):
-        return self.title 
+        return self.title
+
+class Comment(models.Model):
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
