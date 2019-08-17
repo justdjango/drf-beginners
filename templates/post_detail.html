@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DRF Beginners | Post detail</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+</head>
+<body>
+    <div class="form">
+        <form method="POST" id='postForm'>
+            <input type="text" id="title" placeholder="title" />
+            <input type="text" id="content" placeholder="content" />
+            <input type="text" id="author" placeholder="author" />
+            <button id='submitButton' type="submit">Update</button>
+        </form>
+    </div>
+    <a href='/'><- Post list</a>
+    <div id='root'></div>
+    <script src="{% static 'js/detail.js' %}"></script>
+</body>
+</html>
